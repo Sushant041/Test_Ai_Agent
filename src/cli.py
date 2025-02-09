@@ -12,6 +12,7 @@ from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.history import FileHistory
 from src.agent import ZerePyAgent
 from src.helpers import print_h_bar
+from src.actions.scrape import collect_tweets
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -107,6 +108,18 @@ class ZerePyCLI:
                 aliases=['agents', 'ls-agents']
             )
         )
+
+        # Inside the _initialize_commands method
+        self._register_command(
+            Command(
+                name="fetch-tweets",
+                description="Fetches recent tweets from a specified user.",
+                tips=["Format: fetch-tweets {username}"],
+                handler=self.fetch_tweets,
+                aliases=['tweets', 'get-tweets']
+            )
+        )
+
         
         # Load agent command
         self._register_command(
@@ -229,6 +242,12 @@ class ZerePyCLI:
     ###################
     # Helper Functions
     ###################
+    def fetch_tweets(self, input_list: List[str]) -> None:
+        # Assuming input_list contains the username as the first element
+        username = input_list[0]  # Extract username from input list
+        collect_tweets(logger, username)  # Pass the username to collect_tweets
+
+
     def _register_command(self, command: Command) -> None:
         """Register a command and its aliases"""
         self.commands[command.name] = command
